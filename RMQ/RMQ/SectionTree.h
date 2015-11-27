@@ -32,7 +32,7 @@ class SectionTree{
 		if (l == tl && r == tr)
 			return treeData[v];
 		int tm = (tl + tr) / 2;
-		return fmin(min(v * 2, tl, tm, l, min(r, tm)), min(v * 2 + 1, tm + 1, tr, fmax(l, tm + 1), r));
+		return fmin(min(v * 2, tl, tm, l, fmin(r, tm)), min(v * 2 + 1, tm + 1, tr, fmax(l, tm + 1), r));
 	}
 
 	void update(int v, int tl, int tr, int pos, int new_val) {
@@ -44,7 +44,7 @@ class SectionTree{
 				update(v * 2, tl, tm, pos, new_val);
 			else
 				update(v * 2 + 1, tm + 1, tr, pos, new_val);
-			treeData[v] = t[v * 2] + t[v * 2 + 1];
+			treeData[v] = treeData[v * 2] + treeData[v * 2 + 1];
 		}
 	}
 
