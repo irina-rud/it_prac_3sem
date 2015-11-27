@@ -125,7 +125,7 @@ public:
 };
 template <class TVertexID>
 int AStar (TVertexID First, TVertexID Goal) {
-    priority_queue < pair<TVertexID, int>> que;
+    deque < pair<TVertexID, int>> que;
     map <TVertexID, int> dij;
     set<TVertexID> seen;
     set<TVertexID> inQue;
@@ -138,27 +138,33 @@ int AStar (TVertexID First, TVertexID Goal) {
     parent.insert(make_pair(First, First));
     neib.reserve(4);
     dij.insert(make_pair(First, 0));
-    que.insert(make_pair(First, First.hevristics()));
+    que.push_front(make_pair(First, 0));
     inQue.insert(First);
     while (!(que.empty())){
         neib.clear();
         bool tentative_is_better = false;
-        TVertexID  looking= que.pop_back()->first;
+		pair<TVertexID, int> l= que.pop_back();
+		TVertexID  looking = l.first;
         inQue.erase(inQue.find(looking));
         if (looking == Goal){
             return dij[looking];
         }
         seen.insert(looking);
         neib = Graph.getNeighbors(looking);
-        for (int i = 0; i < neib.size(); ++i){
+        for (unsigned int i = 0; i < neib.size(); ++i){
             if (seen.find(neib[i])!=seen.end()){
                 continue;
             }
-            int tmp = dij[First] + 1 ;
-            if (inQue.find(neib[i])){
+            int tmp = dij[looking] + 1 ;
+            if (inQue.find(neib[i])!= inQue.end()){
                 inQue.insert(neib[i]);
-                dij.insert(make_pair(neib[i], dij[First]+1));
-                que.push(make_pair(neib[i], neib[i].hevristics()+ dij[neib[i]]));
+                dij.insert(make_pair(neib[i], tmp));
+				if (neib[i].hevristics() == looking.hevristics() -1) {
+					que.push_back(make_pair(neib[i], (tmp - 1)));
+				}
+				else {
+					que.push_front(make_pair(neib[i], tmp +1 ));
+				}
                 tentative_is_better = true;
             }
             else{
