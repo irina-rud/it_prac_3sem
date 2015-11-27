@@ -15,32 +15,14 @@ using namespace std;
 
 template <class TVertexID>  class CMyGraph  {
 private:
-    multimap <TVertexID, TVertexID> links;
-    set <TVertexID> vertexes;
 public:
     CMyGraph(TVertexID what){
-        AddVertex(what);
-    }
+	}
 
     vector<TVertexID> getNeighbors(TVertexID who){
         vector<TVertexID> WhoNeighbors = who.getOutgoingPath();
-        for (int i = 0; i < WhoNeighbors.size(); ++i){
-            AddEdge(who, WhoNeighbors[i]);
-        }
+        return getNeighbors;
     }
-
-    void AddEdge(TVertexID from, TVertexID to){
-        this->AddVertex(from);
-        this->AddVertex(to);
-        links.insert(make_pair(from,to));
-    }
-
-    void AddVertex(TVertexID what){
-        if (vertexes.find(what) == vertexes.end()){
-            vertexes.insert(what);
-        }
-    }
-
 };
 
 
@@ -147,7 +129,8 @@ int AStar (TVertexID First, TVertexID Goal) {
     map <TVertexID, int> dij;
     set<TVertexID> seen;
     set<TVertexID> inQue;
-    vector <TVertexID> neib;
+    
+	vector <TVertexID> neib;
     CMyGraph<TVertexID> Graph(First);
     map <TVertexID, TVertexID> parent;
 

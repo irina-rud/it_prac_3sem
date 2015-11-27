@@ -3,6 +3,7 @@
 #define BINOMIALHEAP_INCLUDED
 
 #include <vector>
+#include <memory>
 
 using std::vector;
 using std::pair;
@@ -43,8 +44,8 @@ template <class TVertexID>
 class BasicTree {
 public:
 	TVertexID data;
-	BasicTree* right = NULL;
-	BasicTree* child = NULL;
+	std::shared_ptr<BasicTree*> right = NULL;
+	std::shared_ptr<BasicTree*> child = NULL;
 	size_t degree;
 
 	BasicTree() {}
@@ -87,7 +88,7 @@ public:
 	virtual int ExtractMin() = 0;
 	virtual void meld(CMeldableHeap* addedHeap) = 0;
 
-	virtual BasicTree<TVertexID>* meldSimilar(BasicTree<TVertexID>* tree1, BasicTree<TVertexID>* tree2) = 0;
+	virtual std::shared_ptr<BasicTree<TVertexID>> meldSimilar(std::shared_ptr<BasicTree<TVertexID>> tree1, std::shared_ptr<BasicTree<TVertexID>> tree2) = 0;
 	virtual int getMin() = 0;
 
 	virtual ~CMeldableHeap() {}
@@ -98,9 +99,9 @@ public:
 template <class TVertexID>
 class BinomialHeap : public CMeldableHeap<TVertexID> {
 private:
-	std::vector <BasicTree<TVertexID>*> vectorHeapData;
+	std::vector <std::shared_ptr<BasicTree<TVertexID>>> vectorHeapData;
 
-	BasicTree<TVertexID>* meldSimilar(BasicTree<TVertexID>* tree1, BasicTree<TVertexID>* tree2) {
+	std::shared_ptr<BasicTree<TVertexID>> meldSimilar(std::shared_ptr<BasicTree<TVertexID>> tree1, std::shared_ptr<BasicTree<TVertexID>> tree2) {
 		if (tree1 == NULL) return tree2;
 		if (tree2 == NULL) return tree1;
 		if (tree1->degree != tree2->degree)
@@ -131,7 +132,7 @@ public:
 			throw EmptyTree();
 		}
 		TVertexID minKey = this->vectorHeapData[0]->data;
-		vector <BasicTree<TVertexID>*> ::iterator it = vectorHeapData.begin();
+		vector <std::shared_ptr<BasicTree<TVertexID>>> ::iterator it = vectorHeapData.begin();
 		int minTreeNumb = 0;
 		while (it != vectorHeapData.end())
 		{
@@ -144,13 +145,13 @@ public:
 		}
 		BinomialHeap<TVertexID> addedHeapWithoutExtractedMin;
 		addedHeapWithoutExtractedMin.vectorHeapData.clear();
-		BasicTree<TVertexID>* minTreeIt = vectorHeapData[minTreeNumb];
+		shared_ptr<BasicTree<TVertexID>> minTreeIt = vectorHeapData[minTreeNumb];
 		if (minTreeIt->child != NULL)
 		{
 			minTreeIt = minTreeIt->child;
 			while (minTreeIt != NULL)
 			{
-				BasicTree<TVertexID>* buffer = new BasicTree<TVertexID>;
+				std::shared_ptr<BasicTree<TVertexID>> buffer = make_shared(new BasicTree<TVertexID>);
 				buffer = minTreeIt->right;
 				minTreeIt->right = NULL;
 				addedHeapWithoutExtractedMin.vectorHeapData.push_back(minTreeIt);
@@ -171,17 +172,17 @@ public:
 		{
 			return;
 		}
-		BinomialHeap <TVertexID>* addedHeap = dynamic_cast <BinomialHeap<TVertexID>*> (addedHeapExc);
+		BinomialHeap<TVertexID> addedHeap = dynamic_cast <BinomialHeap<TVertexID>*> (addedHeapExc);
 		if (addedHeap == NULL)
 		{
 			throw BadCastEXC();
 		}
 
-		vector <BasicTree<TVertexID>*> bufferHeapData = this->vectorHeapData;
+		vector <shared_ptr<BasicTree<TVertexID>>> bufferHeapData = this->vectorHeapData;
 		this->vectorHeapData.clear();
-		vector <BasicTree<TVertexID>*>::iterator firstHeapIt = bufferHeapData.begin();
-		vector <BasicTree<TVertexID>*>::iterator secondHeapIt = addedHeap->vectorHeapData.begin();
-		BasicTree<TVertexID>* currentTreeRadical = NULL;
+		vector <std::shared_ptr<BasicTree<TVertexID>>>::iterator firstHeapIt = bufferHeapData.begin();
+		vector <std::shared_ptr<BasicTree<TVertexID>>>::iterator secondHeapIt = addedHeap->vectorHeapData.begin();
+		std::shared_ptr<BasicTree<TVertexID>> currentTreeRadical = NULL;
 		bool frangeCondition;
 		while (!(firstHeapIt == bufferHeapData.end() && secondHeapIt == addedHeap->vectorHeapData.end()))
 		{
@@ -246,7 +247,7 @@ public:
 			throw EmptyTree();
 		}
 		TVertexID minKey = (this->vectorHeapData[0])->data;
-		vector <BasicTree<TVertexID>*> ::iterator it = vectorHeapData.begin();
+		vector <std::shared_ptr<BasicTree<TVertexID>>> ::iterator it = vectorHeapData.begin();
 		int minTreeNumb = 0;
 		while (it != vectorHeapData.end())
 		{
