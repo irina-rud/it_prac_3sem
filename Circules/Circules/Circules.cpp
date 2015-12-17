@@ -1,9 +1,9 @@
 // Circules.cpp: определяет точку входа для консольного приложения.
 //
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <string>
-#include <istream>
+#include <iostream>
 #include <vector>
 
 using namespace std;
